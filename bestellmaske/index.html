@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="de">
+	<head>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>Bestellungen Großhändler</title>
+	</head>
+	<body>
+	<label class="h2">Buchbestellung beim Großhändler</label>
+	<form class="ml-3" action="https://ivm108.informatik.htw-dresden.de/vue20/restful/api/book/order" method="post" id="myform">
+		<div class="form-group">
+			<label for="isbn">ISBN:</label> 
+			<input type="text" name="isbn" id="isbn" maxlength="30">
+		</div>	 
+		<div class="form-group">
+			<label for="quantity">Anzahl:</label> 
+			<input type="text" name="quantity" id="quantity" maxlength="30">
+		</div>	
+		<div class="form-group">
+			<label for="cid">Gruppennummer von 01 bis 25:</label> 
+			<input type="text" name="cid" id="cid" maxlength="30">
+		</div>	
+		<div class="form-group">
+			<label for="cname">Gruppenname oder Shopname:</label> 
+			<input type="text" name="cname" id="cname" maxlength="30">
+		</div>	
+		<button class="btn btn-primary" type="reset">Eingaben zurücksetzen</button>
+		<button class="btn btn-primary" type="submit" id="orderbookbtn">Buch bestellen</button>
+	</form>
+	</body>
+</html>
