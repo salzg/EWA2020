@@ -1,0 +1,72 @@
+[
+   {
+      "ProduktID":"20",
+      "Produktcode":"978-1987595291",
+      "Produkttitel":"Fullstack Vue: The Complete Guide to Vue.js",
+      "Autorname":"Hassan Djirdeh",
+      "Verlagsname":"CreateSpace",
+      "PreisNetto":"34.99",
+      "Mwstsatz":null,
+      "PreisBrutto":null,
+      "Lagerbestand":"12",
+      "Kurzinhalt":null,
+      "Gewicht":null,
+      "LinkGrafikdatei":null
+   },
+   {
+      "ProduktID":"22",
+      "Produktcode":"978-1987595291",
+      "Produkttitel":"Fullstack Vue: The Complete Guide to Vue.js",
+      "Autorname":"Hassan Djirdeh",
+      "Verlagsname":"CreateSpace",
+      "PreisNetto":"34.99",
+      "Mwstsatz":null,
+      "PreisBrutto":null,
+      "Lagerbestand":"100",
+      "Kurzinhalt":null,
+      "Gewicht":null,
+      "LinkGrafikdatei":null
+   },
+   {
+      "ProduktID":"23",
+      "Produktcode":"978-3966450164",
+      "Produkttitel":"JavaScript: Programmieren f\u00c3\u00bcr Einsteiger",
+      "Autorname":"Paul Fuchs",
+      "Verlagsname":"BMU Verlag",
+      "PreisNetto":"14.99",
+      "Mwstsatz":null,
+      "PreisBrutto":null,
+      "Lagerbestand":"200",
+      "Kurzinhalt":null,
+      "Gewicht":null,
+      "LinkGrafikdatei":null
+   },
+   {
+      "ProduktID":"24",
+      "Produktcode":"978-3836263122",
+      "Produkttitel":"Einstieg in PHP 7 und MySQL",
+      "Autorname":"Thomas Theis",
+      "Verlagsname":"Rheinwerk Computing",
+      "PreisNetto":"25.99",
+      "Mwstsatz":null,
+      "PreisBrutto":null,
+      "Lagerbestand":"5",
+      "Kurzinhalt":null,
+      "Gewicht":null,
+      "LinkGrafikdatei":null
+   },
+   {
+      "ProduktID":"25",
+      "Produktcode":"978-1511617994",
+      "Produkttitel":"HTML QuickStart Guide",
+      "Autorname":"Martin Mihajlov",
+      "Verlagsname":"CreateSpace",
+      "PreisNetto":"16.99",
+      "Mwstsatz":null,
+      "PreisBrutto":null,
+      "Lagerbestand":"3",
+      "Kurzinhalt":null,
+      "Gewicht":null,
+      "LinkGrafikdatei":null
+   }
+]

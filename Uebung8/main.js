@@ -1,7 +1,7 @@
 var app = new Vue({
     el: "#app",
     data: {
-		shoptitel: 'Lager Buchshop Gxx',
+		shoptitel: 'Lager Buchshop G10',
 		products: [],
 		timestamp : ""
     },
