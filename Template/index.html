@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="de">
+	<head>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+		<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>Bookshop - Praktikumsaufgabe</title>
+	</head>
+
+	<body>
+	<!-- template for the modal component start -->
+	<script type="text/x-template" id="modal-template">
+	  <transition name="modal">
+		<div class="modal-mask">
+		  <div class="modal-wrapper">
+			<div class="modal-container">
+			  <div class="modal-header">
+				<slot name="header">
+				  default header
+				</slot>
+			  </div>
+			  <div class="modal-body">
+				<slot name="body">
+					Hinweis: Bei Problemen überprüfen Sie Ihre DB-Config oder ob das Buch mit der ID bereits vorhanden ist!
+				</slot>
+			  </div>
+			  <div class="modal-footer">
+				<slot name="footer">
+				  <button class="modal-default-button" @click="$emit('close')">
+					OK
+				  </button>
+				</slot>
+			  </div>
+			</div>
+		  </div>
+		</div>
+	  </transition>
+	</script>
+	<!-- template for the modal component end -->
+  
+    <div id="app">
+		<h1 class ="ml-3">Book Shop des Großhändlers <span class="float-right badge badge-info">Ausgeführte Transaktionen: {{transactions}}</span></h1>
+  
+		<!-- modal component, pass in the prop start -->
+		<modal v-if="showModal" @close="showModal = false">
+			<h3 slot="header" v-text="transferStatus ? 'Buch in die Tabelle *buecher* übertragen!' : 'Buch NICHT übertragen!'"></h3>
+		</modal>
+		<!-- modal component, pass in the prop end -->
+		
+		<div class="input-group input-group mb-3">
+			<div class="input-group-prepend">
+				<span class="input-group-text" id="inputGroup-sizing"><i class="fas fa-search"></i></span>
+				<input class="form-control" style="width:300px;" type="text" v-model="search" placeholder="Nach Titel, ISBN oder Sprache suchen" />
+			</div>
+			<div class="input-group-prepend">
+				<span class="input-group-text ml-3" id="inputGroup-sizing">Maximaler Preis:</span>
+				<input type="number" class="form-control" v-model="search2" />
+			</div>
+		</div>
+		<table class="table table-striped">
+		<thead>
+			<tr>
+				<th scope="col">Titel</th>
+				<th scope="col">Author</th>
+				<th scope="col">ISBN</th>
+				<th scope="col">Verlag</th>
+				<th scope="col">Sprache</th>
+				<th scope="col">Preis</th>
+				<th scope="col">Auf Lager</th>
+				<th scope="col">Bestandswert</th>
+				<th scope="col">Übertragen</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr v-for="book, i in filteredBooks" :key="book.id">
+				<td>{{book.title}}</td>
+				<td>{{book.author}}</td>
+				<td>{{book.isbn}}</td>
+				<td>{{book.publisher}}</td>
+				<td>{{book.language}}</td>
+				<td>{{book.price}} €</td>
+				<td>{{book.quantity}}</td>
+				<td>{{revenue(book.price, book.quantity)}} €</td>
+				<td><button id="show-modal" class="btn btn-outline-success mt-1" 
+				v-on:click="transferBook(book); showModal = true"><i class="fas fa-arrow-right"></i></button></td>
+			</tr>
+		</tbody>
+		</table>
+	</div>
+    <script src="https://unpkg.com/vue"></script>
+    <script src="./main.js"></script>
+  </body>
+
+</html>
