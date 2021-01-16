@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue Praktikum</title>
+  </head>
+
+  <body style="font-size:22px">
+    <div id="app">
+		<h1 class="display-4">
+			{{ shoptitel }}
+		</h1>
+		
+	   	<h2>{{ timestamp }}</h2>
+		<ul class="list-group list-group-flush">
+			<li class="list-group-item" v-for="(product, index) in products">
+				Produkt: "{{ product.Produkttitel }}" , 
+				Anzahl: 
+				<span class="badge badge-primary badge-pill">{{ product.Lagerbestand }}</span>
+				<button class="btn btn-outline-success ml-3" @click=increase(index)>+</button>
+				<button class="btn btn-outline-danger" @click=decrease(index)>-</button>
+				<span style="color:red" v-if="product.Lagerbestand == 0">Ausverkauft!</span>
+			</li>
+		</ul>
+	</div>
+	
+    <script src="https://unpkg.com/vue"></script>
+    <script src="main.js"></script>
+  </body>
+
+</html>
