@@ -1,8 +1,9 @@
 <?php
 
+header("Content-Type: text/html; charset=utf-8");
 require("accountdata.php"); // setzt password ==> bitte $password mit Ihrem PW selbst setzen !!! 
 
-$db_link = mysqli_connect ("localhost", "G00", $password ,"g00");
+$db_link = mysqli_connect ("localhost", "G10", $password ,"g10");
 
 // ##########################################################################
 // Neu:  Bitte UTF8 erzwingen bei der DB-Kommunikation (siehe zeilen nach // )  !!!!!
@@ -26,7 +27,7 @@ if ( ! $db_erg )
 }
 $dbdaten = array();   // neues Array fÃ¼r JSON-Ausgabe 
  
-$showtable = false; // nur fÃ¼r Tests - Ausschalten fÃ¼r echte JSON-Generierung als Webservice !!!!
+$showtable = true; // nur fÃ¼r Tests - Ausschalten fÃ¼r echte JSON-Generierung als Webservice !!!!
  
 if ($showtable)  echo '<table border="1">';
 
@@ -35,7 +36,7 @@ while ($zeile = mysqli_fetch_array( $db_erg))
 if ($showtable)
  {echo "<tr>";
   echo "<td>". $zeile['ProduktID'] . "</td>";
-  echo "<td>". $zeile['Produkttitel'] . "</td>";
+  echo "<td><a href='?detailID=" . $zeile['ProduktID'] .  "'>" . $zeile['Produkttitel'] . "</a></td>";
   echo "<td>". $zeile['Lagerbestand'] . "</td>";
   echo "</tr>";
   } 
@@ -43,6 +44,7 @@ if ($showtable)
 }
 if ($showtable) echo "</table>";
 
+/*
 // Ausgabe der Daten als JSON 
 $dbdaten_as_json = json_encode($dbdaten);
 echo $dbdaten_as_json;
@@ -53,6 +55,7 @@ echo $dbdaten_as_json;
 $datei = fopen("dbjson.txt","w"); 
 $written =  fwrite($datei, $dbdaten_as_json);
 fclose($datei); 
- 
+ */
+
 mysqli_free_result( $db_erg );
 ?>
