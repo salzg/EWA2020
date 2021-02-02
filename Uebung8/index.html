@@ -3,32 +3,217 @@
   <head>
 	<meta charset="UTF-8">
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vue Praktikum</title>
+    <title>Bookshop</title>
   </head>
-
+ 
   <body style="font-size:22px">
+
+	<!-- template for the modal component start -->
+	<script type="text/x-template" id="modal-template">
+		<transition name="modal">
+		  <div class="modal-mask">
+			<div class="modal-wrapper">
+			  <div class="modal-container">
+				<div class="modal-header">
+				  <slot name="header">
+					default header
+				  </slot>
+				</div>
+				<div class="modal-body">
+				  <slot name="body">
+					  Hinweis: Bei Problemen überprüfen Sie Ihre DB-Config oder ob das Buch mit der ID bereits vorhanden ist!
+				  </slot>
+				</div>
+				<div class="modal-footer">
+				  <slot name="footer">
+					<button class="modal-default-button" @click="$emit('close')">
+					  OK
+					</button>
+				  </slot>
+				</div>
+			  </div>
+			</div>
+		  </div>
+		</transition>
+	  </script>
+	  <!-- template for the modal component end -->
     <div id="app">
-		<h1 class="display-4">
-			{{ shoptitel }}
+
+		<!-- modal component, pass in the prop start -->
+		<modal v-if="showModal" v-on:close="showModal = false">
+			<h3 slot="header" v-text="transferStatus ? 'Buch in die Tabelle *buecher* übertragen!' : 'Buch NICHT übertragen!'"></h3>
+		</modal>
+		<!-- modal component, pass in the prop end -->
+
+		<button v-if="customer" class="btn btn-outline-success ml-3 float-right" v-on:click=switchUser()>
+			Zu Internbereich
+		</button>
+		<button v-else class="btn btn-outline-success ml-3 float-right" v-on:click=switchUser()>
+			Zu Kundenbereich
+		</button>
+		<h1 class="display-4" style="font-family: Snell Roundhand"> 
+			<i> {{ shoptitel }} </i>			
 		</h1>
-		
-	   	<h2>{{ timestamp }}</h2>
-		<ul class="list-group list-group-flush">
-			<li class="list-group-item" v-for="(product, index) in products">
-				Produkt: "{{ product.Produkttitel }}" , 
-				Anzahl: 
-				<span class="badge badge-primary badge-pill">{{ product.Lagerbestand }}</span>
-				<button class="btn btn-outline-success ml-3" @click=increase(index)>+</button>
-				<button class="btn btn-outline-danger" @click=decrease(index)>-</button>
-				<span style="color:red" v-if="product.Lagerbestand == 0">Ausverkauft!</span>
-			</li>
-		</ul>
-	</div>
+		<div v-if="customer">
+			<div class="input-group col-sm float-right">
+				<!-- Hier Suche anpassen-->
+				<span class="input-group-text" id="inputGroup-sizing"><i class="fa fa-search"></i></span>
+				<input class="form-control " type="text" id="product-search-input" v-model="search" placeholder="Filtern Sie nach Titel, Author, Verlag, Preis" />
+				
+			</div>
+			<!--Buchanzeige-->
+			<h2>Bücher</h2>
+				<div class="table-responsive">
+				<table class="table table-striped table-hover">
+					<thead>
+						<tr>
+							<th scope="col">Titel</th>
+							<th scope="col">Author</th>
+							<th scope="col">Verlag</th>
+							<th scope="col">ISBN</th>
+							<th scope="col">Preis</th>
+							<th scope="col">Auf Lager</th>
+							<th scope="col"></th>
+							<th scope="col">Im Warenkorb</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="product, i in filteredProducts" :key="product.id">
+							<!--book umbenennen-->
+							<td>{{product.Produkttitel}}</td>
+							<td>{{product.Autorname}}</td>
+							<td>{{product.Verlagsname}}</td>
+							<td>{{product.Produktcode}}</td>
+							<td>{{product.PreisBrutto}} €</td>
+							<td>{{product.Lagerbestand}}</td>
+							<td>	
+								<button v-if="product.Lagerbestand > 0" class="btn btn-success" v-on:click=addToShoppingCart(product.ProduktID,1)><i class="fa fa-shopping-cart"></i></button>
+								<span v-else style="color:red">Ausverkauft!</span>
+								<button v-if="product.orderAmount > 0" class="btn btn-danger" v-on:click=removeFromShoppingCart(product.ProduktID,1)><i class="fa fa-minus"></i></button>
+								</div>
+							</td>
+							<td>
+								<div v-if="product.orderAmount >0">
+									{{product.orderAmount}}															
+								</div>
+							</td>
+
+						</tr>
+					</tbody>
+					</table>
+				</div>
+
+				<p class="float-right">alle Preise inkl. 7% Mwst</p>
+			
+			
+				<hr/>
+			<div v-if="shoppingCart.length>0">
+				<h2>Warenkorb</h2>
+
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item" v-for="product in shoppingCart">
+						<span class="font-weight-bold">Produkt: "{{ product.Produkttitel }}", {{product.PreisBrutto}}€ je Einheit</span>
+						<span style="color:red" v-if="product.Lagerbestand == 0">Danach ausverkauft!</span>
+						<button v-if="product.orderAmount > 0" class="btn btn-danger btn-sm" v-on:click=removeFromShoppingCart(product.ProduktID,1) style="float: right"><i class="fa fa-minus"></i></button>
+						<button v-if="product.Lagerbestand > 0" class="btn btn-success btn-sm" v-on:click=addToShoppingCart(product.ProduktID,1) style="float: right"><i class="fa fa-plus"></i></button>
+						<span class="font-weight-bold" style="float:right">Zwischenpreis: {{(product.orderAmount * product.PreisBrutto).toFixed(2)}}€ &nbsp</span>
+						<span class="font-weight-bold" style="float:right">Anzahl: {{product.orderAmount}},&nbsp</span>
+					</li>
+				</ul>
+				<button class="btn btn-secondary btn-block" v-on:click=emptyShoppingCart()><i class="fa fa-trash-alt"></i>Warenkorb leeren</button>
+				
+				<span class="font-weight-bold" style="float:right">zzgl. Versandkosten (inkl. MwSt) {{(shippingCosts).toFixed(2)}}€</span></br>
+				<span class="font-weight-bold" style="float:right">Gesamtkosten {{((shippingCosts + cartCost).toFixed(2))}}€</span>
+
+				<button class="btn btn-success btn-lg btn-block" id="checkoutBtn" v-on:click=orderFromUs()><i class="fa fa-trash-alt"></i>Zahlungspflichtig mit Stripe bestellen</button>
+
+			</div>
+
+
+
+			
+		</div>
+		<div v-if="!customer">
+				<h1 class ="ml-3">Book Shop des Großhändlers <span class="float-right badge badge-info">Ausgeführte Transaktionen: {{transactions}}</span></h1>
 	
-    <script src="https://unpkg.com/vue"></script>
-    <script src="main.js"></script>
+			
+			
+			<div class="input-group input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text" id="inputGroup-sizing"><i class="fas fa-search"></i></span>
+					<input class="form-control" style="width:300px;" type="text" v-model="search" placeholder="Nach Titel, ISBN oder Sprache suchen" />
+				</div>
+				<div class="input-group-prepend">
+					<span class="input-group-text ml-3" id="inputGroup-sizing">Maximaler Preis:</span>
+					<input type="number" class="form-control" v-model="search2" />
+				</div>
+			</div>
+			<table class="table table-striped">
+			<thead>
+				<tr>
+					<th scope="col">Titel</th>
+					<th scope="col">Author</th>
+					<th scope="col">ISBN</th>
+					<th scope="col">Verlag</th>
+					<th scope="col">Sprache</th>
+					<th scope="col">Preis</th>
+					<th scope="col">Auf Lager</th>
+					<th scope="col">Bestandswert</th>
+					<th scope="col">Übertragen</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-for="book, i in filteredBooks" :key="book.id">
+					<td>{{book.title}}</td>
+					<td>{{book.author}}</td>
+					<td>{{book.isbn}}</td>
+					<td>{{book.publisher}}</td>
+					<td>{{book.language}}</td>
+					<td>{{book.price}} €</td>
+					<td>{{book.quantity}}</td>
+					<td>{{revenue(book.price, book.quantity)}} €</td>
+					<td><button id="show-modal" class="btn btn-outline-success mt-1" 
+					v-on:click="transferBook(book); showModal = true"><i class="fa fa-arrow-right"></i></button></td>
+				</tr>
+			</tbody>
+			</table>
+			<label class="h2">Buchbestellung beim Großhändler</label>
+
+			
+
+			<div v-if="modalMessage">
+				<h3 v-if="modalError" slot="header" class="alert alert-danger"> {{modalMessage}}</h3>
+				<h3 v-else slot="header" class="alert alert-primary"> {{modalMessage}}</h3>
+			</div>	
+			
+			<form class="ml-3" id="myform" v-on:submit.prevent="orderFromTrader">
+				<div class="form-group">
+					<label for="isbn">ISBN:</label> 
+					<input type="text" name="isbn" id="isbn" maxlength="30" value="ISBN eingeben">
+				</div>	 
+				<div class="form-group">
+					<label for="quantity">Anzahl:</label> 
+					<input type="text" name="quantity" id="quantity" maxlength="30" value="1">
+				</div>	
+				<div class="form-group">
+					<label for="cid">Gruppennummer von 01 bis 25:</label> 
+					<input type="text" name="cid" id="cid" maxlength="30" value="10">
+				</div>	
+				<div class="form-group">
+					<label for="cname">Gruppenname oder Shopname:</label> 
+					<input type="text" name="cname" id="cname" maxlength="30" value="Hollas & Söhne">
+				</div>	
+				<button class="btn btn-primary" type="reset">Eingaben zurücksetzen</button>
+				<button class="btn btn-primary" type="submit" id="orderbookbtn">Bücher bestellen</button>
+			</form>
+		</div>
+	</div>
+	<script src="https://unpkg.com/vue"></script>
+	<script src="https://js.stripe.com/v3/"></script>
+	<script src="main.js"></script>
+	
   </body>
 
 </html>

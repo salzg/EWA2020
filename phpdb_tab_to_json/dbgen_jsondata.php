@@ -2,7 +2,7 @@
 
 header("Content-Type: text/html; charset=utf-8");
 require("accountdata.php"); // setzt password ==> bitte $password mit Ihrem PW selbst setzen !!! 
-
+$showtable = true; // nur fÃ¼r Tests - Ausschalten fÃ¼r echte JSON-Generierung als Webservice !!!!
 $db_link = mysqli_connect ("localhost", "G10", $password ,"g10");
 
 // ##########################################################################
@@ -17,6 +17,28 @@ $db_link->query("SET CHARACTER SET utf8");
 $db_link->query("SET SESSION collation_connection = 'utf8_unicode_ci'");
 // ##########################################################################
 
+echo '<label for="title">Title</label><br>
+<input type="text" id="title" name="title"><br>
+<label for="author">Author</label><br>
+<input type="text" id="author" name="author">
+<input type="submit" value="Submit">';
+
+if(isset($_GET['detailID']))
+{
+
+    $showtable=false;
+    $sqlprodukt = "SELECT * FROM buecher WHERE ProduktID = ".$_GET['detailID']."";
+    $db_erg1 = mysqli_query( $db_link, $sqlprodukt );
+    while ($zeile = mysqli_fetch_array( $db_erg1))
+    {
+        echo "bla";
+        echo "<table border="1"><tr>";
+        echo "<td>". $zeile['ProduktID'] . "</td><td>".$zeile['Produktcode']."</td><td>".$zeile['Produkttitel']."</td><td>".$zeile['Autorname']."</td>";
+        echo "<td>".$zeile['Verlagsname']."</td><td>".$zeile['PreisNetto']."</td><td>".$zeile['Mwstsatz']."</td><td>".$zeile['PreisBrutto']."</td>";
+        echo "<td>".$zeile['Lagerbestand']."</td><td>".$zeile['Kurzinhalt']."</td><td>".$zeile['Gewicht']."</td><td>".$zeile['LinkGrafikdatei']."</td>";
+        echo "</tr></table>";
+    }
+}
  
 $sql = "SELECT * FROM buecher";
  
@@ -27,7 +49,9 @@ if ( ! $db_erg )
 }
 $dbdaten = array();   // neues Array fÃ¼r JSON-Ausgabe 
  
-$showtable = true; // nur fÃ¼r Tests - Ausschalten fÃ¼r echte JSON-Generierung als Webservice !!!!
+
+
+
  
 if ($showtable)  echo '<table border="1">';
 
@@ -57,5 +81,5 @@ $written =  fwrite($datei, $dbdaten_as_json);
 fclose($datei); 
  */
 
-mysqli_free_result( $db_erg );
+ mysqli_free_result( $db_erg );
 ?>

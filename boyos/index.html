@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<link rel="stylesheet" href="css/css/font-awesome.min.css">
+	<link rel="stylesheet" href="css/myCss.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Flourish and Blotts - 1654</title>
+	
+  </head>
+
+  <body style="font-size:22px; margin-bottom:100px">
+    <div id="app">
+
+		<div v-if="modalMessage">
+			<h3 v-if="modalError" slot="header" class="alert alert-danger"> {{modalMessage}}</h3>
+			<h3 v-else slot="header" class="alert alert-primary"> {{modalMessage}}</h3>
+		  </div>
+		<button v-if="kunde" class="btn btn-outline-success ml-3 float-right" @click=switchUser()>
+			Zum internen Bereich wechseln
+		</button>
+		<button v-else class="btn btn-outline-success ml-3 float-right" @click=switchUser()>
+			Zum Kundenbereich wechseln
+		</button>
+		<div v-if="kunde">
+			
+			<div class="container">
+				<h1 class="display-4" style="font-family:'Berkshire Swash';  text-shadow: 2px 2px #4e4e4e;">
+					<span style="font-size:80pt;">Flourish</span>
+					<span style="font-size:65pt;">&</span>
+					<span style="font-size:80pt;">Blotts</span>
+					<span style="font-size:30pt;"> est. 1654</span>
+				</h1>
+				<a href="https://goo.gl/maps/s7ZDTjuAQWSeAmgP6" class="float-right"><i class="fa fa-map-marker" aria-hidden="true"></i>
+					North Side, Diagon Alley, London</a>
+		<div class="input-group col-sm float-right">
+			<input class="form-control py-2" type="search" value="search" id="book-search-input"
+			v-on:input="updateFilter()" v-model="activeFilter" placeholder="Filtern Sie nach Titel, Author, Verlag, Preis">
+			<span class="input-group-append text-muted"> Zeige {{filteredproducts.length}} von {{products.length}}
+			 </span>
+		 </div>
+		<div class="cold-lg-">
+		<h2>Buchprodukte <i class="fa fa-book" aria-hidden="true"></i></h2>
+			Sort by: 
+			<button 
+			:style="[currentSortOrder=='ProduktTitel' ? {'background-color': 'grey', 'color':'white'} : {'background': '#FFF'}]"
+			@click="sortBy('ProduktTitel')"class="btn">Titel</button>
+			<button 
+			:style="[currentSortOrder=='Autorname' ? {'background-color': 'grey', 'color':'white'} : {'background': '#FFF'}]"
+			@click="sortBy('Autorname')" class="btn">Autor</button>
+			<button 
+			:style="[currentSortOrder=='Preis_Brutto' ? {'background-color': 'grey', 'color':'white'} : {'background': '#FFF'}]"
+			@click="sortBy('Preis_Brutto')" class="btn">Preis</button>
+			<div class="table-responsive">
+			<table class="table table-striped table-hover">
+				<thead>
+					<tr>
+						<th scope="col" style="width: 30%">Titel</th>
+						<th scope="col" style="width: 14%">Author</th>
+						<th scope="col" style="width: 10%">Verlag</th>
+						<th scope="col" style="width: 30%">ISBN</th>
+						<th scope="col" style="width: 18%">Preis</th>
+						<th scope="col" style="width: 5%">Auf Lager</th>
+						<th scope="col" style="width: 5%">Aktionen</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="book in filteredproducts" :key="book.id">
+						<td><span class="font-weight-normal">{{book.ProduktTitel}}</span></td>
+						<td><span class="lead"> {{book.Autorname}} </span></td>
+						<td><span class="lead">{{book.Verlagsname}}</span></td>
+						<td><span class="lead">{{book.ProduktCode}}</span></td>
+						<td><span class="font-weight-normal">{{book.Preis_Brutto}} €</span></td>
+						<td><span class="badge badge-primary badge-pill">{{ book.Lagerbestand }}</span></td>
+						<td><div v-if="book.Lagerbestand > 0">
+							<button v-if="book.orderAmount == 0" class="btn btn-success ml-3" @click=addToShoppingCart(book.ProduktID)><i class="fa fa-plus-circle"></i> in den Warenkorb</button>
+							<button v-else class="btn btn-success ml-3" @click=addToShoppingCart(book.ProduktID)><i class="fa fa-plus-circle"></i> in den Warenkorb ({{book.orderAmount}})</button>
+						  </div>
+						<span style="color:red" v-else>Ausverkauft!</span></td>
+					</tr>
+				</tbody>
+				</table>
+			</div>
+
+			<p class="float-right">alle Preise inkl. 7% Mwst</p>
+		</div>
+		</div>
+			<hr/>
+		<div class="container">
+			<h2>Warenkorb <i class="fa fa-shopping-cart" aria-hidden="true"></i></span></h2>
+			<div v-if="shoppingCart.length">
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item" v-for="(product, index) in shoppingCart">
+						<div>
+							{{index + 1}}. {{ product.ProduktTitel }}, 
+							<span class="font-weight-bold">{{product.orderAmount}}x</span>, {{product.Preis_Brutto}}€ Gesamtpreis: <span class="font-weight-bold">{{(product.orderAmount * product.Preis_Brutto).toFixed(2)}} €</span>
+						</div>
+						<br>
+							<button v-if="product.Lagerbestand > 0" class="btn btn-success ml-3" @click=addToShoppingCart(product.ProduktID)> <i class="fa fa-plus-circle"></i> (1) weiteres hinzufügen</button>
+						<span style="color:red" v-else>Mehr haben wir leider nicht!</span>
+						<button class="btn btn-outline-warning float-right" @click=removeFromShoppingCart(product.ProduktID)>
+							<i class="fa fa-minus-circle"></i>
+							{{product.orderAmount > 1 ? "(1) weniger" : "aus Warenkorb entfernen"}}
+						</button>
+					</li>
+				</ul>
+
+				
+
+					
+					<p class="alert alert-primary">Aufgrund der anhaltenden Corona Situation ist <span class="font-weight-bold">nur der Eulenversand verfügbar</span>.</p>
+					<button class="btn btn-outline-primary" @click=emptyShoppingCart()> <i class="fa fa-eraser"></i> Warenkorb leeren</button>
+					<p class="lead">Summe ({{shoppingCart.reduce((acc, curr) => curr.orderAmount + acc, 0)}} Artikel) <span>{{shoppingCart.reduce((acc, curr) => curr.Preis_Brutto * curr.orderAmount + acc, 0).toFixed(2)}} € </span> inkl. 7% Mwst. ({{shoppingCart.reduce((acc, curr) => curr.Preis_Netto * (curr.MWStSatz/100) * curr.orderAmount + acc, 0).toFixed(2)}}€) </p>
+					<p class="lead"> zzgl. Versandkosten: {{(shippingCosts + shippingCosts * 0.07).toFixed(2)}} € inkl. 7% Mwst. ({{(shippingCosts * 0.07).toFixed(2)}}€) für <span class="font-weight-bold">{{(this.shoppingCart.reduce((acc, curr) => acc + curr.orderAmount * (+curr.Gewicht), 0) / 1000).toFixed(3)}}kg </span></p>
+
+					
+					<div v-if="blockOrdering">
+						<p class="alert alert-danger">Bestellungen über 7kg können wir zur Zeit leider nicht ausliefern, die Eulen schaffen nicht so viel Gewicht!
+							Bitte spalten Sie Ihre gewünschten Produkte auf mehrere Bestellungen auf.
+						</p>
+					</div>
+					<div v-else>
+						<p>Gesamtpreis inkl. Versand <span class="font-weight-bold">{{(shoppingCart.reduce((acc, curr) => curr.Preis_Brutto * curr.orderAmount + acc, 0) + shippingCosts * 1.07).toFixed(2)}} € </span> inkl. 7% Mwst. ({{(shoppingCart.reduce((acc, curr) => curr.Preis_Netto * (curr.MWStSatz/100) * curr.orderAmount + acc, 0)+shippingCosts*0.07).toFixed(2)}}) €</p>
+					<button class="btn btn-success ml-6" style="font-size: 20pt;" @click="sendOrderToBackend">Bestellung abschliessen mit <i style="vertical-align: middle;" class="fa fa-cc-stripe fa-2x" aria-hidden="true"></i></button>
+					</div>
+			</div>
+			<div v-else>
+				Der Warenkorb ist leer.
+			</div>
+		</div>
+	</div>
+	<div v-else>
+	  <div id="app-2">
+		  <h1 class ="ml-3">Book Shop des Großhändlers <span class="float-right badge badge-info">Ausgeführte Transaktionen: {{transactions}}</span></h1>
+		  
+		  <div class="input-group input-group mb-3">
+			  <div class="input-group-prepend">
+				  <span class="input-group-text" id="inputGroup-sizing"><i class="fas fa-search"></i></span>
+				  <input class="form-control" style="width:300px;" type="text" v-model="search" placeholder="Nach Titel, ISBN oder Sprache suchen" />
+			  </div>
+			  <div class="input-group-prepend">
+				  <span class="input-group-text ml-3" id="inputGroup-sizing">Maximaler Preis:</span>
+				  <input type="number" class="form-control" v-model="search2" />
+			  </div>
+		  </div>
+		  <table class="table table-striped">
+		  <thead>
+			  <tr>
+				  <th scope="col">Titel</th>
+				  <th scope="col">Author</th>
+				  <th scope="col">ISBN</th>
+				  <th scope="col">Verlag</th>
+				  <th scope="col">Sprache</th>
+				  <th scope="col">Preis</th>
+				  <th scope="col">Auf Lager</th>
+				  <th scope="col">Bestandswert</th>
+				  <th scope="col">Übertragen</th>
+			  </tr>
+		  </thead>
+		  <tbody>
+			  <tr v-for="book, i in filteredBooks" :key="book.id">
+				  <td>{{book.title}}</td>
+				  <td>{{book.author}}</td>
+				  <td>{{book.isbn}}</td>
+				  <td>{{book.publisher}}</td>
+				  <td>{{book.language}}</td>
+				  <td>{{book.price}} €</td>
+				  <td>{{book.quantity}}</td>
+				  <td>{{revenue(book.price, book.quantity)}} €</td>
+				  <td><button id="show-modal" class="btn btn-success mt-1" 
+				  v-on:click="transferBook(book); showModal = true"><i class="fa fa-arrow-right"></i></button></td>
+			  </tr>
+		  </tbody>
+		  </table>
+
+		  <label class="h2">Buchbestellung beim Großhändler</label>
+
+		  <div v-if="modalMessage">
+			<h3 v-if="modalError" slot="header" class="alert alert-danger"> {{modalMessage}}</h3>
+			<h3 v-else slot="header" class="alert alert-primary"> {{modalMessage}}</h3>
+		  </div>
+		  
+	<form class="ml-3" id="myform" @submit.prevent="orderFromGrossHandler">
+		<div class="form-group">
+			<label for="isbn">ISBN:</label> 
+			<input type="text" name="isbn" id="isbn" maxlength="30" value="Hier die ISBN eingeben">
+		</div>	 
+		<div class="form-group">
+			<label for="quantity">Anzahl:</label> 
+			<input type="text" name="quantity" id="quantity" maxlength="30" value="1">
+		</div>	
+		<div class="form-group">
+			<label for="cid">Gruppennummer von 01 bis 25:</label> 
+			<input type="text" name="cid" id="cid" maxlength="30" value="06">
+		</div>	
+		<div class="form-group">
+			<label for="cname">Gruppenname oder Shopname:</label> 
+			<input type="text" name="cname" id="cname" maxlength="30" value="G06, Flourish and Blotts - 1654">
+		</div>	
+		<button class="btn btn-primary" type="reset">Eingaben zurücksetzen</button>
+		<button class="btn btn-primary" type="submit" id="orderbookbtn">Bücher bestellen</button>
+	</form>
+	  </div>
+
+	</div>
+
+	<div v-if="modalMessage">
+		<h3 v-if="modalError" slot="header" class="alert alert-danger"> {{modalMessage}}</h3>
+		<h3 v-else slot="header" class="alert alert-primary"> {{modalMessage}}</h3>
+	  </div>
+
+	  <div @click=removeCookieNotice() style="text-align:center;" class="alert alert-warning fixed-bottom" role="alert" id="cookieNotice">
+		<strong>Wir benutzen keine Cookies!</strong> Sie können den Eulen aber gerne einen Keks geben. :D</i>
+		<button @click=removeCookieNotice() type="button" class="close" aria-label="Close">
+		  <span @click=removeCookieNotice() aria-hidden="true">&times;</span>
+		</button>
+	  </div>
+
+	</div>
+	
+    <script src="https://unpkg.com/vue"></script>
+	<script src="main.js"></script>
+	
+  </body>
+
+</html>
